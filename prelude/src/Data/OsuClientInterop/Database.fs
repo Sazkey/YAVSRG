@@ -273,6 +273,28 @@ type OsuDatabase =
             UserPermissions = read_int br
         }
 
+type OsuCollectionDatabase_Collection = 
+    {
+        Name: string
+        BeatmapHashes: array
+    }
+    static member Read(br: BinaryReader) = 
+        {
+            Name = read_string br
+            BeatmapHashes = Array.init (read_int br) (fun _ -> read_string br)
+        }
+
+type OsuCollectionDatabase = 
+    {
+        Version: int
+        Collections: OsuCollectionDatabase_Collection array
+    }
+    static member Read(br: BinaryReader) = 
+        {
+            Version = read_int br
+            Collections = Array.init (read_int br) (fun _ -> OsuCollectionDatabase_Collection.Read(br))
+        }
+
 type OsuScoreDatabase_Score =
     {
         FilePath: string option
