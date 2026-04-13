@@ -15,7 +15,7 @@ module Collections =
             mutable NewCollections: int
         }
    
-    let private import_osu_collections (osu_root_folder: string, chart_db: ChartDatabase, user_db: UserDatabase, progress: ProgressCallback) : CollectionImportResult =
+    let private import_osu_collections (osu_root_folder: string, library: Library, progress: ProgressCallback) : CollectionImportResult =
 
         let result = 
         {
@@ -36,7 +36,7 @@ module Collections =
         // MD5 -> Imported Interlude data
         let interlude_db_map =
             seq {
-                for entry in chart_db.Entries do
+                for entry in library.Charts.Entries do
                     for origin in entry.Origins do
                         match origin with
                         | ChartOrigin.Osu osu -> yield osu.Md5, (entry.Hash, osu.FirstNoteOffset, osu.SourceRate)
@@ -49,10 +49,9 @@ module Collections =
 
             if osu_collection.BeatmapHashes.length > 0 then
 
-
+                let mania_beatmaps = ResizeArray<string>()
                 for osu_beatmapHash in osu_collection.BeatmapHashes do
 
-                    let mania_beatmaps = ResizeArray<string>()
                     match Map.tryFind osu_beatmapHash interlude_db_map with
                     | Some (interlude_hash, original_osu_file_first_note, original_osu_file_rate) ->
 
